@@ -1,0 +1,64 @@
+Emerging Technologies (HNDSE) 
+EMERGING TECHNOLOGIES 
+HNDSE25.3F , HNDSE26.1F 
+Course Work 2026 
+Hand in Date: 14th October 2026                       
+Submission Date: 29th October 2026 
+Instructions to the students 
+Emerging Technology for a Smarter Future – Innovate, Build, and Transform 
+You are part of a technology innovation team appointed by a local government authority to 
+develop innovative solutions that improve the quality of life of citizens through the effective 
+use of emerging technologies. 
+The authority has identified several challenges in the community, including inefficient waste 
+management, traffic congestion, energy wastage, public safety, limited access to essential 
+services, and inefficient use of public resources. 
+Your team has been tasked with identifying one specific real-world problem and proposing an 
+innovative, technology-driven solution. The proposed solution must integrate at least two 
+emerging technologies, such as Artificial Intelligence (AI), Internet of Things (IoT), Cloud 
+Computing, Blockchain, Robotics, Augmented Reality (AR), Virtual Reality (VR), or Big Data 
+Analytics. 
+You are expected to investigate the selected problem, analyze existing solutions, design a 
+proposed system, and develop a working prototype or simulation that demonstrates the 
+feasibility and potential impact of your solution. 
+Your proposed solution should demonstrate how emerging technologies can be integrated to 
+improve efficiency, enhance user experience, reduce costs, or create measurable social and 
+environmental benefits. 
+Assignment Approach 
+• Group Work (2 ~ 3 Members)  
+• Presentation (5 minutes)  
+• Need to submit a Report by converging entire scenario  
+Avoid Plagiarism 
+Any artifacts submitted by students which are related to the given assignment are accepted with 
+the strict understanding that it's their own property and If evidence of plagiarism is identified 
+then the work submitted by those students will result in zero marks being awarded. 
+Maximum allowed plagiarism percentage rate is 20%., AI tools usage should be 0% percentage. 
+Evaluation Criteria 
+• Individual contribution of each member should be reflected at the presentation. The 
+lecture expects that everyone will highlight their own work. 
+• There must be a slide in the presentation that concisely illustrates the contribution of 
+each member.  
+• The lecture will pick any individual based on their preference and ask questions related 
+to the content presented after the presentation. 
+• Each member of the team should have a broad understanding on the entire work, 
+proposed solution, strategies followed and implementation regardless of the individual 
+contribution.  
+• Marks will be allocated at the time of evaluation in the following manner  
+o Relevance of problem and solution    
+o Innovation and creativity     
+o Effective use of emerging technologies   
+o Quality of prototype (functionality/UI)   
+o Report clarity and completeness    
+o Presentation       
+Submission deadline 
+30% 
+25% 
+15% 
+10% 
+10% 
+10% 
+• The presentation schedule will be announced once the members of the groups are 
+finalized.  
+• Late submission: A late submission will lead to a 25% marks deduction unless there is 
+a valid reason. 
+• Only one report submission is enough from a group and all members name, index 
+number should be mentioned in the report. 
