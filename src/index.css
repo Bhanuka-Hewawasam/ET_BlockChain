@@ -1,5 +1,3 @@
-@import "tailwindcss";
-@import "tw-animate-css";
 
 :root { --ink:#13233a; --muted:#748197; --line:#e7ebf1; --paper:#f7f9fc; --white:#fff; --navy:#11243d; --mint:#35d5ad; --blue:#4a7cf0; --amber:#e8a84d; --red:#ed7275; --radius:14px; }
 * { box-sizing:border-box; }
