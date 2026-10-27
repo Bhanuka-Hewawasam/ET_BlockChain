@@ -1,0 +1,114 @@
+හරි බන් 😎 අපි SHA-256 Hashing කියන technology එක මුල ඉඳන් සරලව තේරුම් ගමු. ඔයාගේ TrustDoc – Document Verification System project එකට මේක ගොඩක් වැදගත්.
+
+## 1. SHA-256 Hashing කියන්නේ මොකක්ද?
+
+SHA-256 (Secure Hash Algorithm 256-bit) කියන්නේ ඕනෑම ආකාරයක data එකක් ගෙන, ඒකෙන් ස්ථාවර දිගකින් යුත් විශේෂ අගයක් (Hash) නිර්මාණය කරන cryptographic algorithm එකක්.
+
+ඒ කියන්නේ පොඩි text එකක් වුණත්, PDF එකක් වුණත්, image එකක් වුණත් ඒ data එකට අදාළ Hash එකක් හදාගන්න පුළුවන්.
+
+Input Data
+
+Certificate.pdf
+
+SHA-256 Algorithm
+
+Data එක ගණනය කර Hash එකක් හදනවා
+
+Output Hash (උදාහරණයක්)
+
+`a1b2c3d4e5f6...`
+
+සම්පූර්ණ SHA-256 Hash එක hexadecimal අක්ෂර 64කින් යුක්තයි.
+
+## 2. Hash එකේ විශේෂත්වය මොකක්ද?
+
+### උදාහරණයක් බලමු
+
+එකම text එකට SHA-256 භාවිත කළොත් එකම Hash එක ලැබෙනවා.
+
+Text 1: `Hello`
+
+Hash: `185f8db3...`
+
+Text 2: `Hello`
+
+Hash: `185f8db3...`
+
+Text 3: `hello`
+
+Hash: `2cf24dba...`
+
+මෙහි මුල් අකුරේ විශාලත්වය පමණක් වෙනස් කරලා. ඒත් Hash එක වෙනස් වෙනවා.
+
+මෙහි Hash අගයන් කෙටියෙන් පෙන්වා තිබෙන්නේ උදාහරණයක් විදිහටයි.
+
+SHA-256 හි ප්‍රධාන ලක්ෂණ හතරක් තියෙනවා:
+
+- Fixed length: Input එකේ ප්‍රමාණය කොච්චර වුණත් output එක බිටු 256යි.
+- Deterministic: එකම input එකට හැමවිටම එකම Hash එක ලැබෙනවා.
+- Avalanche effect: Input එකේ පොඩි වෙනසක් කළත් Hash එකේ බොහෝ කොටස් වෙනස් වෙනවා.
+- One-way: Hash එකෙන් මුල් data එක නැවත ලබාගැනීම ප්‍රායෝගිකව ඉතා අසීරුයි.
+
+## 3. TrustDoc project එකේදී SHA-256 වැඩ කරන්නේ කොහොමද?
+
+Step 1 — Document Registration
+
+බලයලත් ආයතනයක් මුල් සහතිකය ලියාපදිංචි කරනවා. System එක ඒ ගොනුවේ SHA-256 Hash එක ගණනය කරනවා.
+
+Step 2 — Hash Storage
+
+ගණනය කළ Hash එක සහ ලේඛනයේ ID එක විශ්වාසදායක database එකක හෝ නිසි ලෙස සකස් කළ blockchain ledger එකක ගබඩා කරනවා.
+
+Step 3 — Verification
+
+පසුව කෙනෙක් සහතිකයක් ඉදිරිපත් කළාම system එක ඒ ගොනුවේ Hash එක නැවත ගණනය කරනවා.
+
+Step 4 — Compare
+
+- Hash දෙක සමාන නම්: ගොනුවේ bytes ලියාපදිංචි කළ ගොනුවට සමානයි.
+- Hash දෙක වෙනස් නම්: ගොනුව වෙනස් වී තිබිය හැකියි, නැත්නම් වැරදි ගොනුවක් විය හැකියි.
+
+මතක තියාගන්න: Hash එක සමාන වීමෙන් ගොනුවේ අන්තර්ගතය ලියාපදිංචි කළ පිටපතට සමාන බව පෙන්විය හැකියි. නමුත් ඒ සහතිකය ඇත්තටම රජයෙන් නිකුත් කළ එකක්ද කියලා තහවුරු කරන්න නම්, මුල් Hash එක බලයලත් ආයතනයකින් ලියාපදිංචි කර තිබීම අත්‍යවශ්‍යයි.
+
+## 4. පොඩි interactive example එකක්
+
+මෙතැන text එක වෙනස් කරලා Hash එක වෙනස් වෙන ආකාරය බලන්න.
+
+Input text
+
+SHA-256 Hash එක බලන්න
+
+උදා: `Hello` වෙනුවට `hello` හෝ `Hello!` දාලා බලන්න. මේ බොත්තම Hash එක ගණනය කර පැහැදිලි කරන වෙනම පණිවිඩයක් යවයි.
+
+## 5. JavaScript වලින් SHA-256 හදන්නේ කොහොමද?
+
+ඔයාගේ TrustDoc එක React + TypeScript භාවිත කරන නිසා browser එකේම ඇති Web Crypto API එක භාවිත කරන්න පුළුවන්.
+
+```
+async function calculateSHA256(file) {
+  const buffer = await file.arrayBuffer();
+
+  const hashBuffer = await crypto.subtle.digest(
+    "SHA-256",
+    buffer
+  );
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+  return hashArray
+    .map(byte => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+```
+
+මෙහිදී:
+
+1. `file.arrayBuffer()` — ගොනුවේ bytes ලබාගන්නවා.
+2. `crypto.subtle.digest("SHA-256", buffer)` — Hash එක ගණනය කරනවා.
+3. `Uint8Array` — ලැබෙන bytes කියවිය හැකි ආකාරයට ගන්නවා.
+4. `toString(16)` — ඒවා hexadecimal අක්ෂර බවට පත් කරනවා.
+5. `join("")` — සම්පූර්ණ Hash එක එකතු කරනවා.
+
+මේක browser එකේ ක්‍රියාත්මක කරන්න සාමාන්‍යයෙන් HTTPS හෝ `localhost` වැනි secure context එකක් අවශ්‍යයි.
+
+අවසාන වශයෙන්: SHA-256 කියන්නේ ගොනුවේ digital fingerprint එක හදන ක්‍රමයයි. TrustDoc එකේ ඒ fingerprint එක කලින් ලියාපදිංචි කළ විශ්වාසදායක අගය සමඟ සසඳලා ගොනුව වෙනස් වී තිබෙනවාද කියලා පරීක්ෂා කරනවා.
