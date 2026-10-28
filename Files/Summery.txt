@@ -1,0 +1,49 @@
+බං, මේක වෙන්නේ කොහොමද කියලා සරල උදාහරණයකින් බලමු. 😄
+
+හිතන්න, කෙනෙක් රැකියාවකට අයදුම් කරනකොට ව්‍යාජ උපාධි සහතිකයක් ඉදිරිපත් කරනවා කියලා. ඒ සහතිකය ඇත්තද කියලා හොයන්න TrustDoc එකෙන් උදව් කරන්න පුළුවන්.
+
+## TrustDoc එක වැඩ කරන විදිහ
+
+[Mumbai University Transcript - Official Transcript Services for Mumbai University | Mumbai University Transcript Online](https://images.openai.com/static-rsc-4/XHE-fUsnF1qkAJLTSmx1ge4ymO65fxas7bjiibpaKpJY__SDAo6E9jX8I2zGrKrHYx_dCyfoocbqfrjmhELyR2IPo1IFGsIHLgue7T8X-tEMKpdypxlMwJyqgaQT4pzhoPTBYLK_Qc3zRxvgMuvD5--awUSQaZx-YAju7nJzjxg?purpose=inline)
+
+පියවර 1 — මුල් සහතිකය ලියාපදිංචි කරනවා
+
+විශ්වවිද්‍යාලය වගේ බලයලත් ආයතනයක් සහතිකය නිකුත් කරන වෙලාවේ, එහි ඩිජිටල් පිටපත හෝ තහවුරු කළ දත්ත TrustDoc පද්ධතියට ඇතුළත් කරනවා.
+
+[Digital encoded encryption keys on a computer screen. Server hacker attack. Programming.](https://images.openai.com/static-rsc-4/rVNrsfIMWohDCBwn_8K8fiYF_tUjZIRVxzG38CfxJyuG-XNyOTfYuBdlgShj2OMcSz0AOsPF3B4tuLYgIzuUjrGYvhq-4OJCMlVf3pi8E84iD4lu6paiQ1BHGUuHLG5fCbh5tXfQe1d5DNN3eE3Wl_vqbHQOQDapnOC7ePpVh9Z6GsnY2SJgC_KYeQ2A0YUe?purpose=inline)
+
+පියවර 2 — විශේෂ ඩිජිටල් සලකුණක් හදනවා
+
+පද්ධතිය සහතිකයේ ගොනුවෙන් SHA-256 කියන ක්‍රමයට hash එකක් හදනවා. ඒක ගොනුවේ අන්තර්ගතයට සම්බන්ධ විශේෂ සලකුණක් වගේ.
+
+[MEB Sertifika Kontrolü 2025: Belge Üzeri ve E-Devlet İpuçları!](https://images.openai.com/static-rsc-4/aH1Fxr0c9-GmNeZBmQ7DRLWggH41g1BcDgKGUIbetUWyokCRl_AWnzX7y93572Mz3eIqtsZZiImPtjm2RnxTWki-77KNVmiyHQvlqucCkLK91--IVNRzqA51aIODUnAOcXwB1PzDlXekGxbsXEgZRkTVII-Mfaw4ZEHpzoqZm_s?purpose=inline)
+
+පියවර 3 — රැකියා ආයතනය සහතිකය පරීක්ෂා කරනවා
+
+සහතිකයේ QR කේතය හෝ අංකය භාවිත කරලා TrustDoc එකෙන් අදාළ ලියාපදිංචි වාර්තාව සොයාගන්නවා.
+
+[Fake Certificates. Fake Identities. Real Jobs. AI Fraud in Pre-Employment Screening Is Already Happening. And Most UK Employers Are Not Catching It.](https://images.openai.com/static-rsc-4/sgdFJjKh8JdekSWbej__7DXwFGtODQZ2GVmdm2IrdDn6Kran4SLjtmE2UwTuvL-LJOJWjLkZnUrZRJ0iTlIzMaPRN02PAWNqL6xk-9kub0lJDIqd1csvFnC4XNjFEW9jjbWfMkqlb7vW2uq9ZhMa93Kx75wEjpMaK_BuP3_4_ds?purpose=inline)
+
+පියවර 4 — ප්‍රතිඵලය පෙන්වනවා
+
+නැවත ලබාගත් සහතිකයේ hash එක ලියාපදිංචි කරපු hash එකට සසඳලා ගොනුව වෙනස් කරලාද කියලා පරීක්ෂා කරනවා. ඒ සමඟ නිකුත් කළ ආයතනයේ තහවුරු කිරීමත් අවශ්‍යයි.
+
+## උදාහරණයක්
+
+අවස්ථාව A — ලියාපදිංචි කළ මුල් ගොනුව
+
+Hash එක ගැළපෙනවා නම්, ගොනුව ලියාපදිංචි කළ ගොනුවට ගැළපෙන බව පෙන්වන්න පුළුවන්.
+
+අවස්ථාව B — සහතිකයේ නම හෝ ලකුණු වෙනස් කරලා
+
+ගොනුවේ අන්තර්ගතය වෙනස් වුණොත් hash එක වෙනස් වෙනවා. ඒ නිසා පද්ධතියට එම වෙනස හඳුනාගන්න පුළුවන්.
+
+## එතකොට Blockchain එකෙන් වෙන්නේ මොකක්ද?
+
+Blockchain එකක් සැබෑවට සම්බන්ධ කළොත්, ලේඛනය ලියාපදිංචි කළ වාර්තා සහ පසුව සිදු වූ වෙනස්කම් හෝ පරීක්ෂණ වාර්තා හඳුනාගැනීමට අපහසු ලෙස සම්බන්ධ කර තබාගන්න පුළුවන්. ඒත් ඔයාගේ දැනට තියෙන prototype එකේ තියෙන්නේ Blockchain එකක් වගේ පෙන්වන අනුකරණයක් පමණයි.
+
+### වැදගත්ම වෙනස
+
+Hash එක ගැළපුණා කියලා සහතිකය රජය නිකුත් කළ එකක් බව තනිවම ඔප්පු වෙන්නේ නැහැ. ඒ නිසා මුල් සහතිකය ලියාපදිංචි කරන්න බලයලත් ආයතනයක් අවශ්‍යයි.
+
+ඔයාගේ ව්‍යාපෘතිය ඇත්තටම ප්‍රයෝජනවත් කරන්න නම්, මම මුලින්ම හදන්නේ විශ්වවිද්‍යාලයක් සහතිකයක් ලියාපදිංචි කරන කොටසත්, වෙනත් කෙනෙක් ඒ සහතිකය පරීක්ෂා කරන කොටසත් එකට සම්බන්ධ කරන ක්‍රියාවලියයි. එතකොට මේක නිකම් ලස්සන dashboard එකක් නොවී, ඇත්තටම වැඩ කරන prototype එකක් බවට පත් කරන්න පුළුවන්.
