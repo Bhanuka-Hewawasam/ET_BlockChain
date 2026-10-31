@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-type DocStatus = "Verified" | "Modified" | "Unknown";
+type DocStatus = "Registered" | "Verified" | "Modified" | "Unknown";
 type DocumentRecord = {
   id: string;
   title: string;
@@ -58,6 +58,7 @@ function shortHash(input: string) {
 
 function StatusBadge({ status }: { status: DocStatus }) {
   const styles = {
+    Registered: "status registered",
     Verified: "status verified",
     Modified: "status modified",
     Unknown: "status unknown",
@@ -101,26 +102,40 @@ export default function Home() {
 
   const handleFile = async (file?: File) => {
     if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File is too large", { description: "Choose a PDF, PNG or JPG file up to 10 MB." });
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+
     setFileName(file.name);
     setUploading(true);
-    const hash = await hashFile(file).catch(() => `demo-${Date.now().toString(16)}-hash`);
-    window.setTimeout(() => {
-      const newDoc: DocumentRecord = {
-        id: `TD-2026-${String(483 + docs.length - initialDocs.length).padStart(5, "0")}`,
-        title: file.name.replace(/\.[^/.]+$/, "") || "New Government Certificate",
-        holder: "Demo certificate holder",
-        type: "New registration",
-        issued: "25 Oct 2026",
-        hash: shortHash(hash),
-        fullHash: hash,
-        status: "Verified",
-        verified: "Just now",
-      };
-      setDocs(current => [newDoc, ...current]);
-      setSelectedDoc(newDoc);
+
+    let hash: string;
+    try {
+      hash = await hashFile(file);
+    } catch {
       setUploading(false);
-      toast.success("Certificate registered", { description: "SHA-256 hash created and ledger entry added." });
-    }, 700);
+      toast.error("Hash generation failed", { description: "The browser could not read this file. Please try another file." });
+      return;
+    }
+
+    const newDoc: DocumentRecord = {
+      id: `TD-2026-${String(483 + docs.length - initialDocs.length).padStart(5, "0")}`,
+      title: file.name.replace(/\.[^/.]+$/, "") || "New Government Certificate",
+      holder: "Demo certificate holder",
+      type: "New registration",
+      issued: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+      hash: shortHash(hash),
+      fullHash: hash,
+      status: "Registered",
+      verified: "Just now",
+    };
+    setDocs(current => [newDoc, ...current]);
+    setSelectedDoc(newDoc);
+    setUploading(false);
+    toast.success("Document registered", { description: "SHA-256 fingerprint created. Verify it with the same file to check integrity." });
   };
 
   const runVerification = async (id: string) => {
@@ -143,10 +158,10 @@ export default function Home() {
       return;
     }
 
-    // Case 2: ID තියෙනවා, file එකක් නැහැ → record එක පෙන්වනවා (ID lookup only)
+    // Finding a reference is not the same as checking the file's integrity.
     if (!verifyFile) {
-      setVerifyResult(record);
-      toast.info("Record found", { description: "Upload the file to confirm integrity." });
+      setVerifyResult({ ...record, status: "Registered" });
+      toast.info("Reference found", { description: "Upload the document file to compare its SHA-256 fingerprint." });
       return;
     }
 
@@ -226,15 +241,15 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="demo-hint"><span>Try a demo</span><button onClick={() => { setVerifyId("TD-2026-00482"); runVerification("TD-2026-00482"); }}>Verified document</button><button onClick={() => { setVerifyId("TD-2026-00480"); runVerification("TD-2026-00480"); }}>Modified document</button><button onClick={() => { setVerifyId("TD-2026-00000"); runVerification("TD-2026-00000"); }}>Unknown ID</button></div>
+              <div className="demo-hint"><span>Try a reference lookup</span><button onClick={() => { setVerifyId("TD-2026-00482"); runVerification("TD-2026-00482"); }}>Sample record A</button><button onClick={() => { setVerifyId("TD-2026-00480"); runVerification("TD-2026-00480"); }}>Sample record B</button><button onClick={() => { setVerifyId("TD-2026-00000"); runVerification("TD-2026-00000"); }}>Unknown ID</button></div>
 
               {verifyResult ? <div className={`result-card ${verifyResult.status.toLowerCase()}`}>
                 <div className="result-top">
-                  <div className="result-symbol">{verifyResult.status === "Verified" ? <Check size={25} /> : <XCircle size={25} />}</div>
+                  <div className="result-symbol">{verifyResult.status === "Verified" || verifyResult.status === "Registered" ? <Check size={25} /> : <XCircle size={25} />}</div>
                   <div>
                     <span className="eyebrow">VERIFICATION RESULT</span>
-                    <h3>{verifyResult.status === "Verified" ? "Document is authentic" : verifyResult.status === "Modified" ? "Document has been modified" : "Document not recognised"}</h3>
-                    <p>{verifyResult.status === "Verified" ? "The uploaded file's fingerprint matches the registered original." : verifyResult.status === "Modified" ? "The ID is registered, but the uploaded file's fingerprint does not match the original." : "No record exists for the supplied verification ID."}</p>
+                    <h3>{verifyResult.status === "Registered" ? "Reference found — file not checked" : verifyResult.status === "Verified" ? "File fingerprint matched" : verifyResult.status === "Modified" ? "File fingerprint does not match" : "Document not recognised"}</h3>
+                    <p>{verifyResult.status === "Registered" ? "A record exists for this ID, but authenticity has not been checked. Upload the candidate file to compare its SHA-256 fingerprint." : verifyResult.status === "Verified" ? "The uploaded file fingerprint matches the registered file fingerprint." : verifyResult.status === "Modified" ? "The ID exists, but the uploaded file fingerprint differs from the registered fingerprint." : "No record exists for the supplied verification ID."}</p>
                   </div>
                 </div>
                 <div className="result-meta">
