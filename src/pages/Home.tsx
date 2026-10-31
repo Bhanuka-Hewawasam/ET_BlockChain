@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ArrowUpRight,
@@ -78,7 +78,14 @@ function QrVisual({ value }: { value: string }) {
 
 export default function Home() {
   const [location, navigate] = useLocation();
-  const [docs, setDocs] = useState(initialDocs);
+  const [docs, setDocs] = useState<DocumentRecord[]>(() => {
+    try {
+      const saved = window.localStorage.getItem("trustdoc-prototype-records");
+      return saved ? JSON.parse(saved) as DocumentRecord[] : initialDocs;
+    } catch {
+      return initialDocs;
+    }
+  });
   const [selectedDoc, setSelectedDoc] = useState(initialDocs[0]);
   const [verifyId, setVerifyId] = useState("");
   const [verifyResult, setVerifyResult] = useState<DocumentRecord | null>(null);
@@ -89,6 +96,14 @@ export default function Home() {
   const [mobileNav, setMobileNav] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const verifyFileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("trustdoc-prototype-records", JSON.stringify(docs));
+    } catch {
+      toast.error("Could not save records", { description: "Browser storage may be full or unavailable." });
+    }
+  }, [docs]);
 
   const active = location === "/" ? "Overview" : navItems.find(item => item.path === location)?.label ?? "Overview";
   const verifiedCount = docs.filter(doc => doc.status === "Verified").length;
