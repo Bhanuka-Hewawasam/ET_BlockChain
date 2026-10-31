@@ -226,6 +226,8 @@ TrustDoc was developed as an Emerging Technologies coursework prototype under th
 
 - **Semitha Binuk**
 
+- **Dulaj Adhikari**
+
 ## License
 
 No open-source license has been specified for this repository. Unless the repository owner adds a license, all rights remain with the copyright holder.
