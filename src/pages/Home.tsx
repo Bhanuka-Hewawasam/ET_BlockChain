@@ -39,10 +39,10 @@ type DocumentRecord = {
 };
 
 const initialDocs: DocumentRecord[] = [
-  { id: "TD-2026-00482", title: "Advanced Diploma Certificate", holder: "Nethmi Perera", type: "Education", issued: "18 Sep 2026", hash: "a98c...e210", fullHash: "a98c1f3b7d2e4a6c8f0b1d3e5a7c9f0b1d3e5a7c9f0b1d3e5a7c9f0b1d3e210", status: "Verified", verified: "Today, 09:42" },
-  { id: "TD-2026-00481", title: "Business Registration", holder: "Lanka Harvest (Pvt) Ltd", type: "Business", issued: "12 Sep 2026", hash: "7bf2...91ad", fullHash: "7bf2a1c3d5e7f9b1a3c5d7e9f1b3a5c7d9e1f3b5a7c9d1e3f5b7a9c1d3e591ad", status: "Verified", verified: "Today, 08:18" },
-  { id: "TD-2026-00480", title: "Land Ownership Extract", holder: "Kavindu Fernando", type: "Land & property", issued: "10 Sep 2026", hash: "31aa...c09f", fullHash: "31aab2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6c09f", status: "Modified", verified: "Yesterday, 16:05" },
-  { id: "TD-2026-00479", title: "Professional License", holder: "Dr. S. Jayawardena", type: "Professional", issued: "06 Sep 2026", hash: "0f4d...2a98", fullHash: "0f4d1e2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d2a98", status: "Verified", verified: "Yesterday, 14:32" },
+  { id: "TD-2026-00482", title: "Advanced Diploma Certificate", holder: "Nethmi Perera", type: "Education", issued: "18 Sep 2026", hash: "a98c...e210", status: "Registered", verified: "Today, 09:42" },
+  { id: "TD-2026-00481", title: "Business Registration", holder: "Lanka Harvest (Pvt) Ltd", type: "Business", issued: "12 Sep 2026", hash: "7bf2...91ad", status: "Registered", verified: "Today, 08:18" },
+  { id: "TD-2026-00480", title: "Land Ownership Extract", holder: "Kavindu Fernando", type: "Land & property", issued: "10 Sep 2026", hash: "31aa...c09f", status: "Registered", verified: "Yesterday, 16:05" },
+  { id: "TD-2026-00479", title: "Professional License", holder: "Dr. S. Jayawardena", type: "Professional", issued: "06 Sep 2026", hash: "0f4d...2a98", status: "Registered", verified: "Yesterday, 14:32" },
 ];
 
 const navItems = [
@@ -165,7 +165,13 @@ export default function Home() {
       return;
     }
 
-    // Case 3: Hash comparison කරනවා
+    // Sample seed records do not contain a trusted original digest.
+    if (!record.fullHash) {
+      setVerifyResult({ ...record, status: "Registered" });
+      toast.info("Reference found", { description: "This demo record has no trusted original hash to compare against." });
+      return;
+    }
+
     setVerifying(true);
     try {
       const uploadedHash = await hashFile(verifyFile);
@@ -178,9 +184,9 @@ export default function Home() {
       });
 
       if (isMatch) {
-        toast.success("Document is authentic", { description: "Hash matches the registered original." });
+        toast.success("Fingerprint matched", { description: "The uploaded file matches the fingerprint registered in this prototype." });
       } else {
-        toast.error("Document has been modified", { description: "The file's fingerprint does not match." });
+        toast.error("Fingerprint mismatch", { description: "The file's fingerprint differs from the registered fingerprint." });
       }
     } catch {
       toast.error("Verification failed", { description: "Could not read the uploaded file." });
@@ -255,7 +261,7 @@ export default function Home() {
                 <div className="result-meta">
                   <div><span>REFERENCE</span><strong>{verifyResult.id}</strong></div>
                   <div><span>HOLDER</span><strong>{verifyResult.holder}</strong></div>
-                  <div><span>REGISTERED HASH</span><strong>{verifyResult.hash}</strong></div>
+                  <div><span>REGISTERED HASH</span><strong>{verifyResult.fullHash ? verifyResult.hash : "Not available"}</strong></div>
                 </div>
                 <div className="result-footer"><span><span className="status-dot" /> Checked just now</span><button className="text-link" onClick={copyId}><Copy size={14} /> Copy reference</button></div>
               </div> : <div className="empty-result"><QrCode size={25} /><strong>Awaiting a document reference</strong><span>A verification result will appear here with the matching evidence trail.</span></div>}
