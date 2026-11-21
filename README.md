@@ -2,76 +2,61 @@
 
 ### Blockchain-Inspired Government Document Verification System
 
-TrustDoc is a frontend prototype for registering, tracking, and verifying official documents. It demonstrates how cryptographic hashing and a blockchain-inspired audit trail can help organisations detect whether a document matches its registered original.
+TrustDoc is an educational frontend prototype for registering, tracking, and verifying official documents. It demonstrates how SHA-256 hashing and a blockchain-inspired audit trail can help organisations detect whether a presented file matches a previously registered original.
 
-> **Prototype notice:** TrustDoc currently runs as a client-side demonstration. It uses sample records and a simulated ledger; it is not connected to a production blockchain, government database, cloud storage service, or authentication provider.
+> **Prototype notice:** This repository currently runs as a client-side demonstration. It uses sample records and a simulated ledger. It is not connected to a production blockchain, government database, backend API, cloud storage service, or authentication provider.
 
 ![TrustDoc dashboard](Files/Screenshot%202026-10-28%20204817.png)
 
 ## Why TrustDoc?
 
-Employers, universities, banks, and government organisations often need to confirm whether a certificate or official document is genuine. Manual checks can be slow, difficult to audit, and vulnerable to edited copies.
+Employers, universities, banks, and government organisations often need to confirm whether a certificate or official document matches a record supplied by its issuing organisation. Manual checks can be slow and difficult to audit.
 
-TrustDoc demonstrates a simpler flow:
+TrustDoc demonstrates a possible workflow:
 
-1. An authorised issuer selects a document and enters its metadata.
+1. An authorised issuer registers a document and its details.
+2. The application calculates a SHA-256 fingerprint from the exact file bytes.
+3. The document receives a unique verification reference.
+4. A verifier looks up the reference, reviews the registered details, and uploads the presented file.
+5. TrustDoc compares the uploaded file fingerprint with the registered fingerprint and displays the outcome.
 
-1. The application generates a SHA-256 fingerprint from the file.
+A QR code should act only as a convenient link to the verification record. Copying a QR code does not make another certificate genuine: the verifier must compare the registered holder/details and, for file-integrity verification, upload the presented file.
 
-1. The document receives a unique verification ID and a QR-style reference.
+## Features in this prototype
 
-1. A verifier enters the ID and optionally uploads a copy of the document.
-
-1. TrustDoc compares the file fingerprint with the registered record and displays the result.
-
-## Features
-
-- **Overview dashboard** with registered document counts, verification statistics, recent records, and trust signals.
-
+- **Overview dashboard** with registered document counts, sample verification statistics, recent records, and trust signals.
 - **Document registration** for PDF, PNG, and JPG files up to 10 MB.
-
-- **SHA-256 hashing** using the browser's Web Crypto API to create a document fingerprint.
-
-- **Document verification** using a verification ID and optional file upload.
-
-- **Clear verification outcomes:** `Verified`, `Modified`, and `Unknown`.
-
-- **QR-style verification reference** for the selected document.
-
-- **Verification history** showing sample audit events and lookup methods.
-
-- **Responsive civic-administration interface** designed for desktop and smaller screens.
-
-- **Blockchain-inspired disclosure** that makes the prototype's simulation explicit.
+- **SHA-256 hashing** using the browser's Web Crypto API.
+- **Document lookup** using a verification ID.
+- **File integrity check** for records created during the current browser session.
+- **Verification outcomes:** `Verified`, `Modified`, `Registered`, and `Unknown`.
+- **Illustrative QR-style reference** for the selected document (not a scannable QR code yet).
+- **Sample verification history** and a responsive administration interface.
+- **Prototype disclosure** so simulated blockchain functionality is not mistaken for a live network.
 
 ## Demo verification IDs
 
-The verification page includes quick demo buttons for the following sample records:
+The verification page includes sample reference IDs:
 
-| Verification ID | Example document | Expected result |
+| Verification ID | Example document | Current prototype behaviour |
 | --- | --- | --- |
-| `TD-2026-00482` | Advanced Diploma Certificate | Verified |
-| `TD-2026-00480` | Land Ownership Extract | Modified |
-| `TD-2026-00000` | Unknown reference | Unknown |
+| `TD-2026-00482` | Advanced Diploma Certificate | Finds a sample record; it has no trusted original file hash |
+| `TD-2026-00480` | Land Ownership Extract | Finds a sample record; it has no trusted original file hash |
+| `TD-2026-00000` | Unknown reference | Returns Unknown |
 
-You can also open the verification page directly at `/verify` and enter an ID manually.
+To demonstrate an actual hash match in the current prototype, register a file during the session and then verify that same file using the newly generated reference. A modified copy should produce a different hash. New records are held in application state and disappear after a full page reload.
+
+You can open the verification page directly at `/verify`.
 
 ## Technology stack
 
 - [React](https://react.dev/) 18
-
 - [TypeScript](https://www.typescriptlang.org/)
-
 - [Vite](https://vite.dev/)
-
 - [Wouter](https://github.com/molefrog/wouter) for lightweight routing
-
 - [Lucide React](https://lucide.dev/) for icons
-
 - [Sonner](https://sonner.emilkowal.ski/) for toast notifications
-
 - Browser Web Crypto API for SHA-256 hashing
-
 - pnpm for package management
 
 ## Project structure
@@ -83,7 +68,9 @@ You can also open the verification page directly at `/verify` and enter an ID ma
 │   │   └── Home.tsx       # Dashboard, upload, verify, and history views
 │   ├── App.tsx            # Client-side routes
 │   ├── index.css          # Application styles and responsive layout
-│   └── main.tsx           # React entry point
+│   └── main.tsx           # Application entry point
+├── docs/
+│   └── VERIFICATION_ARCHITECTURE.md
 ├── Files/                 # Project screenshots and supporting coursework files
 ├── index.html             # Vite HTML entry point
 ├── package.json           # Scripts and dependencies
@@ -96,7 +83,6 @@ You can also open the verification page directly at `/verify` and enter an ID ma
 ### Prerequisites
 
 - Node.js 18 or newer
-
 - pnpm 9 or newer
 
 Check your installed versions:
@@ -143,89 +129,67 @@ pnpm preview
 ### Register a document
 
 1. Open the **Upload certificate** view.
-
-1. Choose a PDF, PNG, or JPG file.
-
-1. Enter or update the document details.
-
-1. TrustDoc calculates a SHA-256 fingerprint in the browser.
-
-1. The new record is added to the current prototype session and a success notification is displayed.
+2. Choose a PDF, PNG, or JPG file.
+3. TrustDoc calculates a SHA-256 fingerprint in the browser.
+4. A demonstration record is added to the current application session.
 
 ### Verify a document
 
 1. Open the **Verify document** view.
-
-1. Enter a verification ID, such as `TD-2026-00482`.
-
-1. Optionally upload the document copy you want to compare.
-
-1. Select **Verify document**.
-
-1. Review the result and the registered hash details.
-
-The prototype's sample records are held in application state, so newly added records are not persisted to a backend database after a full page reload.
+2. Enter a verification ID.
+3. Upload the candidate document file.
+4. Select **Verify now**.
+5. Review the result and the registered hash details.
 
 ## Verification logic
 
-TrustDoc uses a file fingerprint rather than exposing the complete document in the verification record:
+The prototype fingerprints file bytes:
 
 ```
 file bytes → SHA-256 → document fingerprint
 ```
 
-If the supplied file produces the same fingerprint as the registered file, the prototype can report a match. If the reference exists but the fingerprint differs, it reports a modified document. If no record matches the entered ID, it reports an unknown document.
+If the supplied file produces the same fingerprint as the registered file, the prototype reports a match. If the reference exists but the fingerprint differs, it reports a modified file. If no record matches the entered ID, it reports an unknown document.
 
-A matching hash confirms that the supplied file matches the registered file. It does **not**, by itself, prove that the document was originally issued by a legitimate institution. A production system must restrict registration to authorised issuers and protect the registration process.
+A matching hash confirms that the supplied file is byte-for-byte identical to the file registered in the prototype. It does **not**, by itself, prove that the document was originally issued by a legitimate institution. A production system must verify issuers and protect the registration process.
 
 ## Current limitations
 
-This repository is an educational prototype and should not be used to verify real government documents. In particular:
+This repository is an educational prototype and must not be used to verify real government documents.
 
-- The ledger is simulated; no real blockchain network is used.
-
+- The ledger is simulated; no live blockchain network or smart contract is connected.
 - Records are demonstration data and client-side state is not backed by a database.
-
 - There is no production authentication, authorisation, or role-based access control.
-
-- The QR graphic is a visual prototype and is not currently generated by a QR encoder.
-
-- Files are hashed in the browser but are not uploaded to secure object storage.
-
+- The QR graphic is illustrative and is not currently generated by a QR encoder.
+- Files are hashed in the browser but are not uploaded to secure cloud object storage.
+- Seeded sample records do not include trusted original file digests for hash comparison.
 - There are no production privacy, encryption-at-rest, backup, revocation, or monitoring controls.
-
 - Dashboard metrics and some history entries are sample presentation data.
 
-## Roadmap
+## Recommended next steps
 
-Potential next steps for a production-oriented version include:
+A production-oriented version should be developed in stages:
 
-- Add a secure backend API and managed database.
+1. Add a secure backend API and managed database.
+2. Add verified issuer onboarding, authentication, and role-based permissions.
+3. Store original files in private encrypted cloud object storage.
+4. Generate real QR codes containing HTTPS verification URLs.
+5. Display registered certificate details and clearly distinguish details mismatch from file hash mismatch.
+6. Replace the simulated ledger with an auditable permissioned blockchain network where the use case justifies it.
+7. Store only the minimum required hash and registration evidence on-chain; keep personal details and PDFs off-chain.
+8. Add document revocation/expiry, audit logging, automated tests, monitoring, and backup procedures.
+9. Provide an API for universities, employers, and other authorised organisations.
 
-- Add issuer authentication and role-based permissions.
-
-- Store files in encrypted object storage and retain only the required metadata and hash references.
-
-- Generate real QR codes that open a public verification URL.
-
-- Add document revocation and expiry workflows.
-
-- Replace the simulated ledger with an auditable permissioned ledger where appropriate.
-
-- Add automated tests, server-side validation, monitoring, and backup procedures.
-
-- Provide an API for universities, employers, and other authorised organisations.
+See [docs/VERIFICATION_ARCHITECTURE.md](docs/VERIFICATION_ARCHITECTURE.md) for the proposed issuer-to-verifier workflow, component responsibilities, security requirements, and QR-copy scenario.
 
 ## Academic context
 
-TrustDoc was developed as an Emerging Technologies coursework prototype under the theme **“Emerging Technology for a Smarter Future.”** The project explores practical uses of cryptographic hashing, cloud-ready record management, and blockchain-inspired linked records for document integrity verification.
+TrustDoc was developed as an Emerging Technologies coursework prototype under the theme **“Emerging Technology for a Smarter Future.”** The project explores practical uses of cryptographic hashing, cloud-ready record management, and blockchain-based integrity evidence for document verification.
 
 ## Contributors
 
 - **Bhanuka Hewawasam**
-
 - **Semitha Binuk**
-
 - **Dulaj Adhikari**
 
 ## License
