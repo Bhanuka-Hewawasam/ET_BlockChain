@@ -78,10 +78,13 @@ A normal database is still useful for searchable metadata, user accounts, status
 This repository is a frontend demonstration, not a deployed production service.
 
 - SHA-256 hashing is performed in the browser using the Web Crypto API.
-- New records are held in React application state and are lost on a full page reload.
+- Real QR codes are generated with `qrcode.react`. Each QR encodes a URL on the current application origin with the document reference in a query parameter.
+- Opening that URL loads the verification view and automatically looks up the reference.
+- Newly registered demo records are persisted in the same browser using `localStorage`.
+- Browser-local records are not synchronised across devices. A shared backend/database is required for an employer using another phone or computer to retrieve newly registered documents.
 - The ledger is simulated; there is no live blockchain network or smart contract.
 - There is no backend API, managed database, cloud object storage, or production authentication.
-- The QR graphic is illustrative and is not a scannable QR code.
-- The seeded sample records are display examples and do not contain original file digests for real hash comparison. To demonstrate a successful comparison, register a file in the current session and verify using that same file; then try a changed copy.
+- The seeded sample records are display examples and do not contain original file digests for real hash comparison. To demonstrate a successful comparison, register a file and verify it using the same file in the same browser; then try a changed copy.
+- The verification view displays registered metadata for manual comparison. It does not automatically extract and validate text from the uploaded PDF.
 
 These limitations are intentionally stated so the prototype does not claim security or integrations that have not been implemented.
