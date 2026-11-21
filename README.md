@@ -32,6 +32,7 @@ A QR code should act only as a convenient link to the verification record. Copyi
 - **Verification outcomes:** `Verified`, `Modified`, `Registered`, and `Unknown`.
 - **Real QR code generation** using `qrcode.react`; each QR encodes a verification URL containing the document reference.
 - **QR deep-link lookup**: opening a QR URL loads the Verify Document view and looks up the reference automatically.
+- **QR export**: download the generated code as an SVG file for placing on a sample certificate.
 - **Local demo persistence**: newly registered records are saved in the current browser using `localStorage`.
 - **Sample verification history** and a responsive administration interface.
 - **Prototype disclosure** so simulated blockchain functionality is not mistaken for a live network.
@@ -134,7 +135,7 @@ pnpm preview
 2. Choose a PDF, PNG, or JPG file.
 3. TrustDoc calculates a SHA-256 fingerprint in the browser.
 4. A demonstration record is saved in the current browser and a unique reference is created.
-5. Open **Verify document** to display a real QR code for that reference. Share the verification URL or scan the QR code.
+5. Open **Verify document** to display a real QR code for that reference. Download the QR as SVG, share the verification URL, or scan it with a phone camera.
 
 ### Verify a document
 
