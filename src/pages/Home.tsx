@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ArrowUpRight,
@@ -24,6 +24,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 
 type DocStatus = "Registered" | "Verified" | "Modified" | "Unknown";
 type DocumentRecord = {
@@ -36,6 +37,7 @@ type DocumentRecord = {
   fullHash?: string;
   status: DocStatus;
   verified: string;
+  issuer?: string;
 };
 
 const initialDocs: DocumentRecord[] = [
@@ -67,18 +69,18 @@ function StatusBadge({ status }: { status: DocStatus }) {
 }
 
 function QrVisual({ value }: { value: string }) {
-  const cells = useMemo(() => Array.from({ length: 81 }, (_, index) => {
-    const finder = (x: number, y: number) => (x < 7 && y < 7) || (x > 7 && y < 7) || (x < 7 && y > 7);
-    const x = index % 9;
-    const y = Math.floor(index / 9);
-    return finder(x, y) ? ((x === 0 || x === 6 || y === 0 || y === 6 || (x > 1 && x < 5 && y > 1 && y < 5)) ? 1 : 0) : ((value.charCodeAt(index % value.length) + index * 7) % 3 === 0 ? 1 : 0);
-  }), [value]);
-  return <div className="qr-code" aria-label="QR verification code">{cells.map((cell, index) => <span key={index} className={cell ? "qr-on" : "qr-off"} />)}</div>;
+  return <div className="qr-code" aria-label="Scannable TrustDoc verification QR code"><QRCodeSVG value={value} size={220} level="H" includeMargin /></div>;
 }
 
 export default function Home() {
   const [location, navigate] = useLocation();
-  const [docs, setDocs] = useState(initialDocs);
+  const [docs, setDocs] = useState<DocumentRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem("trustdoc:registered-documents");
+      const customDocs = saved ? JSON.parse(saved) as DocumentRecord[] : [];
+      return [...initialDocs, ...customDocs.filter(doc => !initialDocs.some(seed => seed.id === doc.id))];
+    } catch { return initialDocs; }
+  });
   const [selectedDoc, setSelectedDoc] = useState(initialDocs[0]);
   const [verifyId, setVerifyId] = useState("");
   const [verifyResult, setVerifyResult] = useState<DocumentRecord | null>(null);
@@ -87,6 +89,10 @@ export default function Home() {
   const [fileName, setFileName] = useState("");
   const [uploading, setUploading] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const [documentType, setDocumentType] = useState("Advanced Diploma");
+  const [holderName, setHolderName] = useState("Demo certificate holder");
+  const [issueDate, setIssueDate] = useState("2026-10-25");
+  const [issuingAuthority, setIssuingAuthority] = useState("Department of Examinations");
   const fileRef = useRef<HTMLInputElement>(null);
   const verifyFileRef = useRef<HTMLInputElement>(null);
 
@@ -123,10 +129,11 @@ export default function Home() {
 
     const newDoc: DocumentRecord = {
       id: `TD-2026-${String(483 + docs.length - initialDocs.length).padStart(5, "0")}`,
-      title: file.name.replace(/\.[^/.]+$/, "") || "New Government Certificate",
-      holder: "Demo certificate holder",
-      type: "New registration",
-      issued: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+      title: documentType + " Certificate",
+      holder: holderName.trim() || "Not provided",
+      type: documentType,
+      issued: issueDate ? new Date(issueDate + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Not provided",
+      issuer: issuingAuthority.trim() || "Not provided",
       hash: shortHash(hash),
       fullHash: hash,
       status: "Registered",
@@ -157,6 +164,8 @@ export default function Home() {
       toast.error("Unknown document", { description: "No record found for this ID." });
       return;
     }
+
+    setSelectedDoc(record);
 
     // Finding a reference is not the same as checking the file's integrity.
     if (!verifyFile) {
@@ -195,10 +204,34 @@ export default function Home() {
     }
   };
 
+  const verificationUrl = window.location.origin + "/?verify=" + encodeURIComponent(selectedDoc.id);
+
   const copyId = () => {
     navigator.clipboard?.writeText(selectedDoc.id);
     toast.success("Verification ID copied");
   };
+
+  const copyVerificationLink = () => {
+    navigator.clipboard?.writeText(verificationUrl);
+    toast.success("Verification link copied");
+  };
+
+  useEffect(() => {
+    try {
+      const customDocs = docs.filter(doc => !initialDocs.some(seed => seed.id === doc.id));
+      localStorage.setItem("trustdoc:registered-documents", JSON.stringify(customDocs));
+    } catch { toast.error("Could not save this demo record in this browser."); }
+  }, [docs]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reference = params.get("verify") ?? params.get("ref");
+    if (!reference) return;
+    setVerifyId(reference);
+    void runVerification(reference);
+    window.history.replaceState({}, "", "/verify");
+    if (location !== "/verify") navigate("/verify");
+  }, [location]);
 
   return (
     <div className="app-shell">
@@ -219,7 +252,7 @@ export default function Home() {
             <section className="dashboard-grid"><div className="panel recent-panel"><div className="panel-head"><div><p className="eyebrow">LIVE REGISTER</p><h2>Recent documents</h2></div><Link href="/history" className="text-link">View full history <ArrowUpRight size={14} /></Link></div><div className="table-wrap"><table><thead><tr><th>DOCUMENT</th><th>HOLDER</th><th>ISSUED</th><th>STATUS</th><th /></tr></thead><tbody>{docs.slice(0, 4).map(doc => <tr key={doc.id} onClick={() => { setSelectedDoc(doc); navigate("/verify"); }}><td><div className="doc-cell"><div className="doc-icon"><FileCheck2 size={16} /></div><div><strong>{doc.title}</strong><span>{doc.id}</span></div></div></td><td>{doc.holder}</td><td>{doc.issued}</td><td><StatusBadge status={doc.status} /></td><td><ChevronRight size={16} className="row-arrow" /></td></tr>)}</tbody></table></div></div><div className="panel trust-panel"><div className="panel-head"><div><p className="eyebrow">INTEGRITY LAYER</p><h2>Trust signals</h2></div><ShieldCheck className="panel-head-icon" size={20} /></div><div className="trust-score"><div className="score-ring"><strong>98</strong><span>/100</span></div><div><strong>Healthy register</strong><p>All active records have a linked hash and audit trail.</p></div></div><div className="signal-list"><div><span className="signal-dot mint" /> Hash integrity <strong>100%</strong></div><div><span className="signal-dot blue-dot" /> Ledger continuity <strong>100%</strong></div><div><span className="signal-dot amber-dot" /> Pending review <strong>{modifiedCount} record</strong></div></div><div className="disclosure"><Blocks size={15} /><span><strong>Blockchain-inspired prototype</strong> — ledger entries are simulated for demonstration.</span></div></div></section>
           </>}
 
-          {active === "Upload certificate" && <section className="content-grid"><div className="panel form-panel"><div className="panel-head"><div><p className="eyebrow">NEW REGISTRATION</p><h2>Add a certificate</h2></div><FilePlus2 className="panel-head-icon" size={20} /></div><div className="upload-zone" onClick={() => fileRef.current?.click()}><input ref={fileRef} type="file" hidden accept=".pdf,.png,.jpg,.jpeg" onChange={event => handleFile(event.target.files?.[0])} />{uploading ? <div className="spinner" /> : <div className="upload-icon"><UploadCloud size={23} /></div>}<strong>{uploading ? "Creating evidence trail..." : fileName || "Drop a document here"}</strong><span>{uploading ? "Calculating SHA-256 fingerprint" : "PDF, PNG or JPG up to 10 MB"}</span><button className="button secondary small" type="button">Browse files</button></div><div className="form-divider"><span>DOCUMENT DETAILS</span></div><div className="form-grid"><label>Document type<select defaultValue="Advanced Diploma"><option>Advanced Diploma</option><option>Business Registration</option><option>Land Ownership Extract</option><option>Professional License</option></select></label><label>Holder name<input defaultValue="Demo certificate holder" /></label><label>Issue date<input type="date" defaultValue="2026-10-25" /></label><label>Issuing authority<input defaultValue="Department of Examinations" /></label></div><button className="button primary wide" onClick={() => fileRef.current?.click()}><Fingerprint size={16} /> Select file & generate hash</button></div><div className="panel explainer-panel"><div className="mini-icon mint-bg"><Fingerprint size={18} /></div><h3>What happens next?</h3><p>TrustDoc generates a unique SHA-256 fingerprint for the original file. The fingerprint, not the private document content, becomes the integrity reference.</p><div className="step-list"><div><b>01</b><span><strong>Hash</strong> Create a digital fingerprint.</span></div><div><b>02</b><span><strong>Register</strong> Link the record to a ledger entry.</span></div><div><b>03</b><span><strong>Verify</strong> Share a public QR reference.</span></div></div></div></section>}
+          {active === "Upload certificate" && <section className="content-grid"><div className="panel form-panel"><div className="panel-head"><div><p className="eyebrow">NEW REGISTRATION</p><h2>Add a certificate</h2></div><FilePlus2 className="panel-head-icon" size={20} /></div><div className="upload-zone" onClick={() => fileRef.current?.click()}><input ref={fileRef} type="file" hidden accept=".pdf,.png,.jpg,.jpeg" onChange={event => handleFile(event.target.files?.[0])} />{uploading ? <div className="spinner" /> : <div className="upload-icon"><UploadCloud size={23} /></div>}<strong>{uploading ? "Creating evidence trail..." : fileName || "Drop a document here"}</strong><span>{uploading ? "Calculating SHA-256 fingerprint" : "PDF, PNG or JPG up to 10 MB"}</span><button className="button secondary small" type="button">Browse files</button></div><div className="form-divider"><span>DOCUMENT DETAILS</span></div><div className="form-grid"><label>Document type<select value={documentType} onChange={event => setDocumentType(event.target.value)}><option>Advanced Diploma</option><option>Business Registration</option><option>Land Ownership Extract</option><option>Professional License</option><option>Degree Certificate</option></select></label><label>Holder name<input value={holderName} onChange={event => setHolderName(event.target.value)} /></label><label>Issue date<input type="date" value={issueDate} onChange={event => setIssueDate(event.target.value)} /></label><label>Issuing authority<input value={issuingAuthority} onChange={event => setIssuingAuthority(event.target.value)} /></label></div><button className="button primary wide" onClick={() => fileRef.current?.click()}><Fingerprint size={16} /> Select file & generate hash</button></div><div className="panel explainer-panel"><div className="mini-icon mint-bg"><Fingerprint size={18} /></div><h3>What happens next?</h3><p>TrustDoc generates a unique SHA-256 fingerprint for the original file. The fingerprint, not the private document content, becomes the integrity reference.</p><div className="step-list"><div><b>01</b><span><strong>Hash</strong> Create a digital fingerprint.</span></div><div><b>02</b><span><strong>Register</strong> Link the record to a ledger entry.</span></div><div><b>03</b><span><strong>Verify</strong> Share a public QR reference.</span></div></div></div></section>}
 
           {active === "Verify document" && <section className="content-grid verify-layout">
             <div className="panel verify-panel">
@@ -263,10 +296,11 @@ export default function Home() {
                   <div><span>HOLDER</span><strong>{verifyResult.holder}</strong></div>
                   <div><span>REGISTERED HASH</span><strong>{verifyResult.fullHash ? verifyResult.hash : "Not available"}</strong></div>
                 </div>
+                <div className="registered-details"><div><span>REGISTERED DOCUMENT</span><strong>{verifyResult.title}</strong></div><div><span>DOCUMENT TYPE</span><strong>{verifyResult.type}</strong></div><div><span>ISSUING AUTHORITY</span><strong>{verifyResult.issuer ?? "Not recorded in sample data"}</strong></div><div><span>ISSUE DATE</span><strong>{verifyResult.issued}</strong></div></div><p className="details-note">Compare these registered details with the printed certificate. TrustDoc does not automatically extract and validate text from the uploaded PDF.</p>
                 <div className="result-footer"><span><span className="status-dot" /> Checked just now</span><button className="text-link" onClick={copyId}><Copy size={14} /> Copy reference</button></div>
               </div> : <div className="empty-result"><QrCode size={25} /><strong>Awaiting a document reference</strong><span>A verification result will appear here with the matching evidence trail.</span></div>}
             </div>
-            <div className="panel qr-panel"><p className="eyebrow">QR REFERENCE</p><h2>{selectedDoc.id}</h2><QrVisual value={selectedDoc.id} /><strong>Scan to verify publicly</strong><span className="qr-caption">This visual represents the QR destination encoded on the certificate.</span><button className="button secondary wide" onClick={copyId}><Copy size={15} /> Copy verification ID</button></div>
+            <div className="panel qr-panel"><p className="eyebrow">LIVE QR VERIFICATION</p><h2>{selectedDoc.id}</h2><QrVisual value={verificationUrl} /><strong>Scan with a phone camera</strong><span className="qr-caption">Opens the TrustDoc verification page for this reference. The QR code is a locator, not proof of authenticity.</span><button className="button secondary wide" onClick={copyVerificationLink}><Copy size={15} /> Copy verification link</button><button className="button secondary wide" onClick={copyId}><Fingerprint size={15} /> Copy document reference</button></div>
           </section>}
 
           {active === "Verification history" && <section className="panel history-panel"><div className="panel-head"><div><p className="eyebrow">AUDIT TRAIL</p><h2>Verification history</h2></div><div className="history-filter">All outcomes <ChevronRight size={14} /></div></div><div className="history-list">{[...docs, ...docs.slice(0, 2)].map((doc, index) => <div className="history-row" key={`${doc.id}-${index}`}><div className={`history-icon ${doc.status.toLowerCase()}`}>{doc.status === "Verified" ? <Check size={17} /> : <X size={17} />}</div><div className="history-main"><strong>{doc.id}</strong><span>{doc.title} · {index % 2 ? "QR scan" : "ID lookup"}</span></div><StatusBadge status={doc.status} /><div className="history-time">{index === 0 ? "Just now" : doc.verified}</div><ChevronRight size={16} className="row-arrow" /></div>)}</div></section>}
