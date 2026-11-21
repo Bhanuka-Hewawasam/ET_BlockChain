@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   Cloud,
   Copy,
+  Download,
   FileCheck2,
   FilePlus2,
   Fingerprint,
@@ -216,6 +217,25 @@ export default function Home() {
     toast.success("Verification link copied");
   };
 
+  const downloadQr = () => {
+    const svg = document.querySelector(".qr-code svg");
+    if (!(svg instanceof SVGSVGElement)) {
+      toast.error("QR code is not ready yet.");
+      return;
+    }
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const source = new XMLSerializer().serializeToString(clone);
+    const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = "TrustDoc-" + selectedDoc.id + "-QR.svg";
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
+    toast.success("QR code downloaded as SVG.");
+  };
+
   useEffect(() => {
     try {
       const customDocs = docs.filter(doc => !initialDocs.some(seed => seed.id === doc.id));
@@ -300,7 +320,7 @@ export default function Home() {
                 <div className="result-footer"><span><span className="status-dot" /> Checked just now</span><button className="text-link" onClick={copyId}><Copy size={14} /> Copy reference</button></div>
               </div> : <div className="empty-result"><QrCode size={25} /><strong>Awaiting a document reference</strong><span>A verification result will appear here with the matching evidence trail.</span></div>}
             </div>
-            <div className="panel qr-panel"><p className="eyebrow">LIVE QR VERIFICATION</p><h2>{selectedDoc.id}</h2><QrVisual value={verificationUrl} /><strong>Scan with a phone camera</strong><span className="qr-caption">Opens the TrustDoc verification page for this reference. The QR code is a locator, not proof of authenticity.</span><button className="button secondary wide" onClick={copyVerificationLink}><Copy size={15} /> Copy verification link</button><button className="button secondary wide" onClick={copyId}><Fingerprint size={15} /> Copy document reference</button></div>
+            <div className="panel qr-panel"><p className="eyebrow">LIVE QR VERIFICATION</p><h2>{selectedDoc.id}</h2><QrVisual value={verificationUrl} /><strong>Scan with a phone camera</strong><span className="qr-caption">Opens the TrustDoc verification page for this reference. The QR code is a locator, not proof of authenticity.</span><button className="button secondary wide" onClick={copyVerificationLink}><Copy size={15} /> Copy verification link</button><button className="button secondary wide" onClick={downloadQr}><Download size={15} /> Download QR code (SVG)</button><button className="button secondary wide" onClick={copyId}><Fingerprint size={15} /> Copy document reference</button></div>
           </section>}
 
           {active === "Verification history" && <section className="panel history-panel"><div className="panel-head"><div><p className="eyebrow">AUDIT TRAIL</p><h2>Verification history</h2></div><div className="history-filter">All outcomes <ChevronRight size={14} /></div></div><div className="history-list">{[...docs, ...docs.slice(0, 2)].map((doc, index) => <div className="history-row" key={`${doc.id}-${index}`}><div className={`history-icon ${doc.status.toLowerCase()}`}>{doc.status === "Verified" ? <Check size={17} /> : <X size={17} />}</div><div className="history-main"><strong>{doc.id}</strong><span>{doc.title} · {index % 2 ? "QR scan" : "ID lookup"}</span></div><StatusBadge status={doc.status} /><div className="history-time">{index === 0 ? "Just now" : doc.verified}</div><ChevronRight size={16} className="row-arrow" /></div>)}</div></section>}
