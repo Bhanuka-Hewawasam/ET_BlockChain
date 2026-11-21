@@ -232,7 +232,7 @@ export default function Home() {
     anchor.href = objectUrl;
     anchor.download = "TrustDoc-" + selectedDoc.id + "-QR.svg";
     anchor.click();
-    URL.revokeObjectURL(objectUrl);
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     toast.success("QR code downloaded as SVG.");
   };
 
